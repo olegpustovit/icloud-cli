@@ -12,7 +12,7 @@ revision** section and folded into the per-item entries.
 | P0-1 `find_item` canonical IDs | ✅ done | `crates/icloud-api/src/store.rs` + 5 unit tests |
 | P0-2 pre-seed `/tmp` | ✅ done | `ICloudFs::new` is now `async`; mkdirs `/tmp` |
 | P0-3 retry wrappers in CLI | ✅ done | All `cmd_reminders` / `cmd_notes` mutations |
-| P0-4 bashbox redirect wiring | ✅ done | `OlegHQ/bashbox@ee1080a`; rev bumped in both crate manifests; 7 new bashbox tests + live smoke pass |
+| P0-4 bashbox redirect wiring | ✅ done | `Microapps-Labs/bashbox@ee1080a`; rev bumped in both crate manifests; 7 new bashbox tests + live smoke pass |
 | P1-1 created IDs in JSON | ✅ done | `add_reminder` returns `String`, batch returns `Vec<String>` |
 | P1-2 stdout/stderr contract | ✅ done | `print_ok`/`print_ok_with`/`print_hme_action` use `println!` |
 | P1-3 `--plain` / `--quiet` for whoami + HME | ✅ done | TSV + count modes |
@@ -37,7 +37,7 @@ documents the surface, and the surface is wrong today.
 ## TL;DR
 
 - 4 P0 (contract-breaking) bugs, all reproducible against a live account.
-- 1 of them lives in upstream `OlegHQ/bashbox` (redirect support is **dead
+- 1 of them lives in upstream `Microapps-Labs/bashbox` (redirect support is **dead
   code**, never wired into the execution engine).
 - 3 P1 bugs make machine output unusable for agents/scripts.
 - A handful of P2/P3 ergonomics and several feature gaps that should be filed
@@ -336,7 +336,7 @@ done 2>&1 | grep -qi 'oplock\|stale\|conflict' && exit 1 || echo ok
 ### P0-4. Wire `apply_redirections` and `pre_open_output_redirects` into the bashbox execution engine
 
 **Where.**
-- Upstream: `OlegHQ/bashbox` rev `ac7c34eebcc2efcf1895b566c72d9c3265ecad79`
+- Upstream: `Microapps-Labs/bashbox` rev `ac7c34eebcc2efcf1895b566c72d9c3265ecad79`
   (pinned in `crates/icloud-cli/Cargo.toml` and
   `crates/icloud-bash/Cargo.toml`).
 - The dead functions: `src/interpreter/redirections.rs` lines 194 and 333.
@@ -396,7 +396,7 @@ entirely.
 
 **Workflow** (per `AGENTS.md` lines 122 and 226-238):
 
-1. `git clone https://github.com/OlegHQ/bashbox ../bashbox` (no local
+1. `git clone https://github.com/Microapps-Labs/bashbox ../bashbox` (no local
    checkout exists at `~/projects/bashbox` today; the cargo cache copy is
    read-only and not usable for editing).
 2. Branch, fix, test (`cargo test --lib` inside bashbox).

@@ -72,7 +72,7 @@ Unofficial clients report roughly **~5 generated addresses per 30 minutes** per 
 
 ### Goal
 
-`icloud bash -c "COMMAND"` (and optional script path) exposes iCloud data as a POSIX virtual filesystem for shell-style exploration and scripting. The embedded interpreter is **[bashbox](https://github.com/OlegHQ/bashbox)** (Rust bash implementation with a pluggable `FileSystem` trait), pinned as a git dependency in `crates/icloud-cli/Cargo.toml` and `crates/icloud-bash/Cargo.toml`.
+`icloud bash -c "COMMAND"` (and optional script path) exposes iCloud data as a POSIX virtual filesystem for shell-style exploration and scripting. The embedded interpreter is **[bashbox](https://github.com/Microapps-Labs/bashbox)** (Rust bash implementation with a pluggable `FileSystem` trait), pinned as a git dependency in `crates/icloud-cli/Cargo.toml` and `crates/icloud-bash/Cargo.toml`.
 
 ### Specification
 
@@ -119,7 +119,7 @@ crates/icloud-bash/
 - **`icloud-api`**: CloudKit protocol, sync engines, cache, persistence. No knowledge of bash or VFS paths.
 - **`icloud-bash`**: `FileSystem` implementation and iCloud path semantics only.
 - **`icloud-cli`**: User-facing `icloud bash` command and wiring.
-- **`bashbox`**: Upstream interpreter — we maintain the fork at [`OlegHQ/bashbox`](https://github.com/OlegHQ/bashbox), pinned by git rev in both `icloud-cli/Cargo.toml` and `icloud-bash/Cargo.toml`. **For iCloud-specific behavior**, extend `icloud-bash` / `icloud-cli` — do not patch bashbox. **For generic bash bugs** (quoting, expansion, builtins, glob, etc.), fix them in the local checkout at `../bashbox`, run `cargo test --lib` there, commit + push, then bump the `rev = "..."` in both `Cargo.toml` files in lockstep and re-run `cargo build` at the workspace root so `Cargo.lock` updates.
+- **`bashbox`**: Upstream interpreter — we maintain the fork at [`Microapps-Labs/bashbox`](https://github.com/Microapps-Labs/bashbox), pinned by git rev in both `icloud-cli/Cargo.toml` and `icloud-bash/Cargo.toml`. **For iCloud-specific behavior**, extend `icloud-bash` / `icloud-cli` — do not patch bashbox. **For generic bash bugs** (quoting, expansion, builtins, glob, etc.), fix them in the local checkout at `../bashbox`, run `cargo test --lib` there, commit + push, then bump the `rev = "..."` in both `Cargo.toml` files in lockstep and re-run `cargo build` at the workspace root so `Cargo.lock` updates.
 
 ### Testing strategy
 

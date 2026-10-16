@@ -408,7 +408,7 @@ Implemented the correction plan from the installed CLI smoke test.
 - Patched `../bashbox` so normal word expansion removes the escape backslash
   for escaped characters while preserving escaped glob metacharacter semantics.
   Added `echo data > /tmp/foo\ bar; cat /tmp/foo\ bar` as a regression test.
-  Pushed `OlegHQ/bashbox` `dev` at
+  Pushed `Microapps-Labs/bashbox` `dev` at
   `2c4993bd7777cc648e8084729ee166e934dc38b1` and pinned both workspace
   `bashbox` dependencies plus `Cargo.lock` to that revision.
 - Added a shared Notes active-record predicate that excludes
@@ -587,7 +587,7 @@ Not done in this pass:
   created the note in iCloud and the body roundtripped (P0-4 +
   iCloud VFS).
 
-### Bashbox (`OlegHQ/bashbox`)
+### Bashbox (`Microapps-Labs/bashbox`)
 
 - Patched `interpreter/execution_engine.rs` to call
   `pre_open_output_redirects` before dispatch and `apply_redirections`
@@ -630,7 +630,7 @@ closure I introduced in `output.rs` was removed.
 ## Current architecture
 
 - Workspace crates: `icloud-api`, `icloud-cli`, `icloud-bash`.
-- `icloud bash` embeds **[bashbox](https://github.com/OlegHQ/bashbox)** (pinned git dependency in `Cargo.toml` files). A vendored `crates/just-bash/` tree is **not** part of this repository anymore.
+- `icloud bash` embeds **[bashbox](https://github.com/Microapps-Labs/bashbox)** (pinned git dependency in `Cargo.toml` files). A vendored `crates/just-bash/` tree is **not** part of this repository anymore.
 - `icloud-bash::ICloudFs` implements `bashbox::fs::FileSystem`, composing Notes/Reminders sync engines, Hide My Email, and `bashbox::InMemoryFs` for `/tmp` and non-iCloud paths.
 
 ## What to update here
