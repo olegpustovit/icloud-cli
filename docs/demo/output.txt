@@ -1,0 +1,11 @@
+Offline Apple Notes codec example
+Markdown -> compressed protobuf -> Markdown
+
+# Example note
+
+Measure before changing the **worker**.
+
+- [ ] Record a baseline
+- [x] Create a small fixture
+
+Fixture text preserved. No client, login or network request.

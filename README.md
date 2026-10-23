@@ -1,143 +1,54 @@
 # icloud-cli
 
-Rust CLI for iCloud Reminders, Notes, Hide My Email, and an automation-friendly virtual filesystem
+An unofficial Rust client for iCloud Notes, Reminders and Hide My Email, with an embedded shell over a virtual filesystem. It uses Apple's private web endpoints, which can change without notice.
 
-`icloud-cli` is an unofficial command-line client for iCloud features that matter to scripts and agents. It uses the same private web and CloudKit-style endpoints as `icloud.com`; it does not use macOS EventKit or other Apple-only client frameworks.
+![Actual offline Notes codec output using a fictional note](docs/demo/offline-note.png)
 
-## Status
+The example exercises the project's Markdown and compressed protobuf codec. It does not log in, contact Apple or prove live sync compatibility. [Capture details](docs/demo/README.md).
 
-This is a private-endpoint client. Apple can change the web APIs without notice, so release builds are best treated as automation tooling, not a compatibility promise.
+## Try the note codec without an account
 
-Supported areas:
+Use Rust with Cargo and Git. The workspace selects the stable toolchain and fetches a pinned Bashbox dependency.
 
-- Reminders: sync, list, list management, add, add-batch, edit, complete, and delete.
-- Notes: sync, list, folders, get, create, update, move, delete, search, and Markdown export.
-- Hide My Email: list, generate, reserve, deactivate, and delete aliases.
-- Search: local full-text search across Notes, Reminders, and Hide My Email VFS paths.
-- Bash/VFS: `icloud bash` exposes Notes, Reminders, Hide My Email, and `/tmp` through the embedded `bashbox` shell.
-
-## Install
-
-From a checkout:
-
-```bash
-cargo install --path crates/icloud-cli
+```sh
+git clone https://github.com/olegpustovit/icloud-cli.git
+cd icloud-cli
+cargo run --locked -p icloud-api --example offline_note
 ```
 
-For local development:
+This converts a fictional note from Markdown to the internal compressed protobuf representation and back. It checks that the example text survives. It creates no session or API client.
 
-```bash
-cargo build --workspace
-cargo test --workspace
+## Build the CLI
+
+```sh
+cargo build --locked -p icloud-cli
+./target/debug/icloud --help
 ```
 
-No `.envrc` or Homebrew-specific `LIBRARY_PATH` is required. The repo pins the stable Rust toolchain components in `rust-toolchain.toml`.
+The binary is named `icloud`. To install it from this checkout:
 
-Supported release targets are Linux and macOS. Windows builds and release artifacts are not supported.
-
-## Quick Start
-
-Sign in and persist a reusable session:
-
-```bash
-icloud login --username you@example.com
+```sh
+cargo install --locked --path crates/icloud-cli
 ```
 
-For automation, avoid putting passwords in shell history or process lists:
+The code exposes Notes, Reminders, Hide My Email, search, copy and shell commands. The checked-in implementation includes Notes editing and codecs, rather than only metadata listing. Source presence does not establish current compatibility with Apple's services.
 
-```bash
-pass show apple-id | icloud login --username you@example.com --password-stdin
-```
+## Connect an account deliberately
 
-Common commands:
+Read [account commands and development](docs/reference.md) before signing in. `icloud login --help` describes the login flags. Keep passwords out of shell history and treat session files, cookies, tokens and cached note content as sensitive.
 
-```bash
-icloud whoami
-icloud reminders list today
-icloud reminders add --list Inbox "Pay invoice" --due tomorrow
-icloud notes list --folder Notes
-icloud notes get "Project plan"
-icloud hme list
-icloud search "invoice" --path /Reminders
-icloud bash -c 'find /Notes -name "*.md" | head'
-```
+Account commands may contact Apple even when they read a local cache. The global `--max-age` defaults to five seconds; it controls cache freshness, not a guaranteed offline mode. Shell and copy commands can write or delete account data. No live account operation was performed for this documentation capture.
 
-Use `--json` for machine-readable output and `--plain` for stable tab-separated output. Diagnostics and hints go to stderr.
+## Status and checks
 
-## Authentication And Storage
+The [capture notes](docs/demo/README.md) record the build environment, exact commands and bounded results. Notes codec tests use fictional input. Live authentication, sync, mutations, attachment handling, shell writes and cross-platform compatibility need separate checks.
 
-`icloud login` stores a reusable session under the platform config directory by default. Treat session files like credentials.
+The release workflow targets Linux and macOS. Windows release artifacts are not supported. The toolchain file selects `stable`; it does not pin an exact compiler release.
 
-Secrets backends:
+## More detail
 
-- `--secrets file` stores the full session in a local JSON file. This is the default and works in headless environments.
-- `--secrets keychain` stores public session metadata on disk and secrets in the OS keychain.
-
-2FA is explicit. Interactive use prompts for a trusted-device or SMS code when Apple requires it. Automation can pass `--code` or `ICLOUD_2FA_CODE`; use `--no-input` to fail instead of blocking.
-
-## Virtual Filesystem
-
-`icloud bash` runs `bashbox` against this layout:
-
-```text
-/
-├── Notes/<Folder>/<Title>.md
-├── Reminders/<List>/<Title>.md
-├── HideMyEmail/aliases.json
-└── tmp/
-```
-
-`/tmp` is in-memory per shell session. Notes and Reminders files are Markdown with YAML frontmatter where needed.
-
-### Notes Markdown Contract
-
-Notes bodies are exchanged as Markdown. The current codec is intended to round-trip the supported Apple Notes features that map cleanly to Markdown:
-
-- headings and the first `# Title` line
-- bold, italic, bold+italic, strikethrough, underline, and links
-- bullet lists and checklists
-- Apple Notes tables represented as Markdown pipe tables
-
-Attachments are read as `/Attachments/<id>.<ext>` references where metadata is available, but attachment mutation is not a v1 feature. Rich Apple Notes features without a stable Markdown representation, including collaboration metadata and password-protected notes, are outside the current release scope.
-
-`icloud notes delete` and folder deletion follow Apple Notes semantics: notes are moved to Recently Deleted. Active CLI, VFS, search, and export surfaces hide those trashed records, but the CLI does not currently hard-purge Recently Deleted items.
-
-## Development
-
-Install the pre-push hook:
-
-```bash
-./scripts/install-hooks.sh
-```
-
-The hook runs:
-
-```bash
-cargo fmt --all
-cargo clippy --workspace --all-targets --fix --allow-dirty --allow-staged --locked -- -D warnings
-cargo test --workspace --locked
-```
-
-If formatting or clippy applies fixes, the hook stops the push so you can review and commit the generated changes. Set `ICLOUD_SKIP_PRE_PUSH=1` to bypass it intentionally.
-
-Manual release-readiness checks:
-
-```bash
-cargo fmt --all -- --check
-cargo clippy --workspace --all-targets --locked -- -D warnings
-cargo test --workspace --locked
-```
-
-## Releases
-
-Pushing a tag like `v0.1.0` runs `.github/workflows/release.yml` and publishes native archives for Linux, macOS Intel, and macOS Apple Silicon.
-
-## Security Notes
-
-- Do not commit Apple IDs, passwords, session files, cookies, CloudKit tokens, or keychain exports.
-- This tool will not bypass Apple account security, captcha, rate limits, or abuse protections.
-- Hide My Email generation appears rate-limited by Apple; expect roughly a handful of generated aliases per 30 minutes and an account-level alias ceiling.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
+- [Account and development reference](docs/reference.md)
+- [Progress and unresolved behavior](PROGRESS.md)
+- [Development rules](AGENTS.md)
+- [Protocol references](references/README.md)
+- [MIT license](LICENSE)

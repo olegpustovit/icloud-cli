@@ -759,3 +759,10 @@ After substantial VFS, `icloud bash`, or bashbox integration work, record:
 
 - Consider adding a dedicated `icloud edit` command if the same host-editor workflow should be available outside the bash REPL.
 - Consider adding a small regression test around REPL builtin parsing once the interactive path is factored into a testable helper.
+
+## 2026-10-23 documentation cleanup
+
+- Replaced stale metadata-only Notes status with source-backed implementation notes and explicit live-service limits. Removed unverified fixed Hide My Email quotas from development guidance.
+- Added a fictional offline Markdown/protobuf round-trip example and actual stdout capture. It creates no client, session or network request.
+- Locked CLI build passed on Linux aarch64 with Rust 1.96.0. The offline example preserved the selected fixture text; 30 existing Notes tests passed, with 20 unrelated tests filtered out. CLI help ran without account access.
+- No live account, sync, mutation, attachment, shell write or release-target validation. Existing product follow-ups above remain open. Documentation cleanup is not live integration qualification.

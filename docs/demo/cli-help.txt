@@ -1,0 +1,59 @@
+CLI for iCloud Reminders, Notes, and Hide My Email
+
+Usage: icloud [OPTIONS] <COMMAND>
+
+Commands:
+  login      Sign in with Apple ID (SRP + 2FA) and persist the session
+  whoami     Validate the current session and show account info
+  reminders  Manage iCloud Reminders
+  notes      Manage iCloud Notes
+  hme        Manage Hide My Email aliases (iCloud+ required)
+  bash       Run bash (bashbox) against the iCloud virtual filesystem
+  search     Full-text search across iCloud Notes and Reminders VFS paths and file contents
+  cp         Copy files between the host filesystem and the iCloud VFS
+  version    Print the CLI version (and machine-readable JSON with --json)
+  help       Print this message or the help of the given subcommand(s)
+
+Options:
+  -j, --json
+          Output JSON to stdout for scripts and agents
+
+      --plain
+          Emit stable tab-separated output for piping
+
+  -q, --quiet
+          Minimal output (counts only)
+
+      --no-color
+          Disable colored output
+
+      --no-input
+          Disable interactive prompts (fail instead of asking)
+
+      --secrets <SECRETS>
+          Session secret storage: plain JSON file or OS keychain
+
+          Possible values:
+          - file:     Full session in a JSON file (default, works in CI/headless)
+          - keychain: Public JSON on disk, secrets in OS keychain
+          
+          [default: file]
+
+      --max-age <MAX_AGE>
+          Skip the network check if the local cache is younger than this many seconds (0 = always
+          check). The check is lightweight (only fetches changes since last sync), so the default is
+          low
+          
+          [default: 5]
+
+  -h, --help
+          Print help (see a summary with '-h')
+
+  -V, --version
+          Print version
+
+EXIT CODES:
+  0  success
+  2  usage error or unknown resource
+  3  authentication / session error
+  4  transport, upstream, or cache error

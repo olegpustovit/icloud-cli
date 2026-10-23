@@ -45,10 +45,10 @@ This repository is a **Rust** command-line tool for **iCloud** features that mat
 - When Apple changes behavior, fix in **`icloud-api`** with clear errors (`endpoint changed`, `missing cookie`, `session expired`, etc.).
 - Add **tests** with redacted JSON fixtures where struct parsing is stable.
 
-## “Fully featured” Notes
+## Notes implementation and limits
 
-- **v1** targets folder/list, read, create, update plain or minimally formatted body, delete. Rich text, attachments, collaboration, and password-protected notes are **later** phases and may require capability flags.
-- **Current CLI:** `icloud notes list` performs a **zone sync page** (metadata + encrypted fields as returned by the API). Decryption, protobuf `Document` decode, and mutating calls are **not** wired yet; use ElyaConrad/iCloud-API and `references/notes.md` when extending.
+- The source includes folder/list, read, write and Markdown codec paths. Codecs support selected formatting; attachment mutations, collaboration and protected notes need separate implementation and validation. Do not infer live service support from a local codec check.
+- **Current source:** Notes includes Markdown/protobuf codecs, sync and write modules plus CLI operations. The older metadata-only status is obsolete. Source presence does not qualify live Apple behavior; read README.md and PROGRESS.md for verification limits. Use offline fixtures for captures.
 
 ## References
 
@@ -66,7 +66,7 @@ This repository is a **Rust** command-line tool for **iCloud** features that mat
 
 ## Hide My Email rate limits
 
-Unofficial clients report roughly **~5 generated addresses per 30 minutes** per account (family pooling may apply) and a **~700** total-alias ceiling. Surface these constraints in user-facing docs/help when expanding HME features.
+Rate limits are service-controlled. Do not publish a fixed quota without current supporting evidence. Surface actual rate-limit errors and avoid automatic alias-generation retries.
 
 ## Bash / Virtual Filesystem Feature
 
